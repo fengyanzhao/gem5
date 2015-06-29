@@ -146,6 +146,9 @@ struct TlbEntry
     bool xn;                // Execute Never
     bool pxn;               // Privileged Execute Never (LPAE only)
 
+    //Iso-X bit
+    bool cbit;              // C Bit for Iso-X
+
     //Construct an entry that maps to physical address addr for SE mode
     TlbEntry(Addr _asn, Addr _vaddr, Addr _paddr,
              bool uncacheable, bool read_only) :
