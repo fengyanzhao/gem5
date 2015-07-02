@@ -116,7 +116,16 @@ IsoX::inComp(Addr addr)
     return false;
 }
 
+CTEntry
+IsoX::getEntry(int comp_id)
+{
+    //No implementation.
+    return ct->getEntry(comp_id);
+}
 
-
+IsoxArgus::IsoxArgus(void)
+{
+    //No implementation.
+}
 
 

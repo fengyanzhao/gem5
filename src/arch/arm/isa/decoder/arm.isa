@@ -78,6 +78,7 @@ format DataOp {
                         0: Breakpoint::bkpt();
                         1: ArmSmcHyp::armSmcHyp();
                     }
+		    0x8: IsoxInst::isoxinst();
                 }
                 0x1: ArmHalfWordMultAndMultAcc::armHalfWordMultAndMultAcc();
             }

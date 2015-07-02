@@ -95,6 +95,8 @@ private:
 
 public:
     IsoX();
+    
+    CTEntry getEntry(int comp_id);
 
     Addr readCPTBASEReg();
 
@@ -118,5 +120,24 @@ public:
 };
 
 static IsoX isox;
+
+/* Arguments for Isox Instructions
+ *
+ */
+class IsoxArgus
+{
+private:
+public:
+    IsoxArgus();
+    int comp_id;
+    Addr comp_base;
+    size_t comp_size;
+    Addr cpt_base;
+    size_t cpt_size;
+    Addr virt_addr;
+    Addr phys_addr;
+    int page_perms;
+};
+static IsoxArgus isoxargus;
 #endif /*__BASE_ISOX_HH__*/
 

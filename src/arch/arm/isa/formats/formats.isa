@@ -85,3 +85,6 @@
 
 //gem5-internal pseudo instructions
 ##include "pseudo.isa"
+
+//Iso-x instructions
+##include "isox.isa"
