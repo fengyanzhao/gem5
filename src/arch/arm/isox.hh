@@ -102,7 +102,7 @@ public:
 
     CTEntry readCCRCTReg();
 
-    int readPSRReg();
+    bool readPSRReg();
 
     void setCPTBASEReg(Addr base);
 
@@ -110,7 +110,7 @@ public:
 
     void setCCRCTReg(CTEntry cte);
 
-    void setPSRReg(int mode);
+    void setPSRReg(bool mode);
 
     bool isCompMode();
 

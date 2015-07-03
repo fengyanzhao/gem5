@@ -51,62 +51,55 @@ IsoX::IsoX(void)
 Addr
 IsoX::readCPTBASEReg()
 {
-    //No implementation.
-    Addr addr = (Addr)0;
-    return addr;
+    return cpt_base;
 }
 
 int
 IsoX::readCCRIDReg()
 {
-    //No implementation.
-    return 0;
+    return ccr_id;
 }
 
 CTEntry
 IsoX::readCCRCTReg()
 {
-    //No implementation.
-    struct CTEntry cte;
-    return cte;
+    return ccr_ct;
 }
 
-int
+bool
 IsoX::readPSRReg()
 {
-    //No implementation.
-    return 0;
+    return psr;
 }
 
 void
 IsoX::setCPTBASEReg(Addr base)
 {
-    //No implementation.
+    cpt_base = base;
 }
 
 void
 IsoX::setCCRIDReg(int id)
 {
-    //No implementation.
+    ccr_id =id;
 }
 
 void
 IsoX::setCCRCTReg(CTEntry cte)
 {
-    //No implementation.
+    ccr_ct = cte;
 }
 
 void
-IsoX::setPSRReg(int mode)
+IsoX::setPSRReg(bool mode)
 {
-    //No implementation.
+    psr = mode;
 }
 
 bool
 IsoX::isCompMode()
 {
-    //No implementation.
-    return false;
+    return psr;
 }
 
 bool
