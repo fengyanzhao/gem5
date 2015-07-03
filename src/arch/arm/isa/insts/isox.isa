@@ -1,0 +1,64 @@
+//
+// Copyright (c) Tianjin University
+// All rights reserved
+//
+// Author: Li Yinnan
+//
+
+
+let {{
+    
+    #header_output = ""
+    #decoder_output = ""
+    #exec_output = ""
+    
+    #Comp_Init
+    code = '''
+        int Comp_id = isoxargus.comp_id;
+        Addr Comp_base = isoxargus.comp_base;
+        size_t Comp_size = isoxargus.comp_size;
+        Addr Cpt_base = isoxargus.cpt_base;
+        size_t Cpt_size = isoxargus.cpt_size;
+        CTEntry *cte = 0;
+        *cte = isox.getEntry(Comp_id);
+        cte->comp_base = Comp_base;
+        cte->comp_size = Comp_size;
+        cte->cpt_base = Cpt_base;
+        cte->cpt_size = Cpt_size;
+    '''
+    mnem = "comp_init"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += PredOpExecute.subst(iop)
+
+    #Comp_Enter
+    code = '''
+        int Comp_id = isoxargus.comp_id;
+        isox.setCCRIDReg(Comp_id);
+        CTEntry *cte = 0;
+        *cte = isox.getEntry(Comp_id);
+        isox.setCCRCTReg(*cte);
+        isox.setPSRReg(1);
+        resTemp = cte->comp_base;
+    '''
+    mnem = "comp_enter"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += PredOpExecute.subst(iop)
+
+}};
+

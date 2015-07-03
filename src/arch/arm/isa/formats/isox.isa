@@ -1,0 +1,44 @@
+//
+// Copyright (c) Tianjin University
+// All rights reserved
+//
+// Author: Li Yinnan
+//
+
+
+def format IsoxInst() {{
+    decode_block = '''
+    {
+        const uint32_t op1 = bits(machInst, 24, 22);
+        /*****
+        const uint32_t op1 = bits(machInst, 24);
+        const IntRegIndex r0 = (IntRegIndex)(uint32_t)bits(machInst, 23, 20);
+        const uint32_t imm2 = bits(machInst, 11, 10);
+        const IntRegIndex r1 = (IntRegIndex)(uint32_t)bits(machInst, 19, 16);
+        const IntRegIndex r2 = (IntRegIndex)(uint32_t)bits(machInst, 15, 12);
+        const IntRegIndex r3 = (IntRegIndex)(uint32_t)bits(machInst, 11, 8);
+        const IntRegIndex r4 = (IntRegIndex)(uint32_t)bits(machInst, 3, 0);
+        if (op1 == 0){
+            return new Comp_init(machInst, r0, r1, r2, r3 ,r4);
+        }else{
+        *****/
+	switch (op1) { 
+          case 0x0:
+            return new Comp_init(machInst);
+          case 0x2:
+            return new Comp_enter(machInst);
+          /*case 0x1:
+            return new Cpage_map(machInst);
+          case 0x3:
+            return new Comp_attest(machInst);
+          case 0x4:
+            return new Cpage_revoke(machInst);
+          case 0x5:
+            return new Comp_resume(machInst);*/
+          default:
+            return new Unknown(machInst);
+	 }
+    }
+    '''
+}};
+

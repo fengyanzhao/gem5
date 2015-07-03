@@ -74,3 +74,6 @@
 ##include "neon.isa"
 
 ##include "neon64.isa"
+
+//Iso-x instructions
+##include "isox.isa"
