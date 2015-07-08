@@ -7,45 +7,64 @@
 
 #include "isox.hh"
 
-CMV::CMV(size_t page_count)
+CMV::CMV(size_t page_cnt, size_t page_bits)
 {
-    //No implementation.
+    page_count = page_cnt;
+    page_bits = page_bits;
+    vectors = (bool *)calloc(page_cnt, sizeof(bool));
 }
 
 CMV::~CMV(void)
 {
-    //No implementation.
+    free(vectors);
 }
 
 void
-CMV::setVector(int index, bool vec)
+CMV::setVector(Addr paddr, bool vec)
 {
-    //No implementation.
+    int index = (int)(paddr >> page_bits);
+    if (index > page_count)
+    {
+        //Should never happen.
+    }
+    vectors[index] = vec;
 }
 
 bool
-CMV::getVector(int index)
+CMV::getVector(Addr paddr)
 {
-    //No implementation.
-    return false;
+    int index = (int)(paddr >> page_bits);
+    if(index > page_count)
+    {
+        //Should never happen.
+    }
+    return vectors[index];
 }
 
 CT::CT(void)
 {
-    //No implementation.
+    memset(entries, 0, COMPMAX * sizeof(CTEntry));
 }
 
 CTEntry
 CT::getEntry(int comp_id)
 {
-    //No implementation.
-    struct CTEntry cte;
-    return cte;
+    return entries[comp_id];
 }
 
 IsoX::IsoX(void)
 {
-    //No implementation.
+    // The values of page count and bits can only be specified during runtime.
+    // 65535 and 16 only for testing.
+    // The values of them should be set by bootloader or OS.
+    init(65535, 16);
+}
+
+void
+IsoX::init(size_t page_cnt, size_t page_bits)
+{
+    cmv = new CMV(page_cnt, page_bits);
+    ct = new CT();
 }
 
 Addr
@@ -73,21 +92,11 @@ IsoX::readPSRReg()
 }
 
 void
-IsoX::setCPTBASEReg(Addr base)
-{
-    cpt_base = base;
-}
-
-void
 IsoX::setCCRIDReg(int id)
 {
     ccr_id =id;
-}
-
-void
-IsoX::setCCRCTReg(CTEntry cte)
-{
-    ccr_ct = cte;
+    ccr_ct = ct->getEntry(id);
+    cpt_base = ccr_ct.cpt_base;
 }
 
 void
@@ -103,16 +112,38 @@ IsoX::isCompMode()
 }
 
 bool
-IsoX::inComp(Addr addr)
+IsoX::inComp(Addr vaddr)
 {
-    //No implementation.
-    return false;
+    if (vaddr < ccr_ct.comp_base)
+    {
+        return false;
+    }
+
+    if (vaddr - ccr_ct.comp_base < ccr_ct.comp_size)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool
+IsoX::getCMV(Addr paddr)
+{
+    return cmv->getVector(paddr);
+}
+
+void
+IsoX::setCMV(Addr paddr, bool vec)
+{
+    cmv->setVector(paddr, vec);
 }
 
 CTEntry
 IsoX::getEntry(int comp_id)
 {
-    //No implementation.
     return ct->getEntry(comp_id);
 }
 

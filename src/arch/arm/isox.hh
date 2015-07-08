@@ -12,8 +12,8 @@
  * Iso-X component and data structure
  */
 
-#ifndef __BASE_ISOX_HH__
-#define __BASE_ISOX_HH__
+#ifndef __ARCH_ARM_ISOX_HH__
+#define __ARCH_ARM_ISOX_HH__
 
 #include "arch/types.hh"
 #include "arch/registers.hh"
@@ -27,7 +27,7 @@ using namespace std;
 /* Compartment Table Entry (CTEntry)
  *
  */
-struct CTEntry
+typedef struct CTEntry
 {
     Addr comp_base;
     size_t comp_size;
@@ -35,7 +35,7 @@ struct CTEntry
     std::hash<std::string> comp_hash;
     Addr cpt_base;
     size_t cpt_size;
-};
+}CTEntry;
 
 /* Physical Page Compartment Membership Vector (CMV)
  *
@@ -43,15 +43,21 @@ struct CTEntry
 class CMV
 {
 private:
-    bool vectors[];
+    /* The number of physical pages*/
+    size_t page_count;
+
+    /* The bits of physical page*/
+    size_t page_bits;
+
+    bool *vectors;
 public:
-    CMV(size_t page_count);
+    CMV(size_t page_count, size_t page_bits);
 
     ~CMV();
 
-    void setVector(int index, bool vec);
+    void setVector(Addr paddr, bool vec);
 
-    bool getVector(int index);
+    bool getVector(Addr paddr);
 };
 
 /* Compartment Table (CT)
@@ -60,6 +66,7 @@ public:
 class CT
 {
 private:
+    CTEntry entries[COMPMAX];
 public:
     CT(void);
 
@@ -76,7 +83,7 @@ private:
     CT *ct;
 
     /* Register pointing to
-     * base address of current compartment
+     * base address of current compartment page table
      */
     Addr cpt_base;
 
@@ -91,11 +98,15 @@ private:
     /* Processor state register*/
     bool psr;
 
-    TableWalker *tablewalker;
-
 public:
     IsoX();
-    
+
+    /** Initialize Iso-X
+     * @page_cnt The number of physical pages used to initialize CMV
+     * @page_bits The bits of physical page used to initialize CMV
+     */
+    void init(size_t page_cnt, size_t page_bits);
+
     CTEntry getEntry(int comp_id);
 
     Addr readCPTBASEReg();
@@ -116,7 +127,11 @@ public:
 
     bool isCompMode();
 
-    bool inComp(Addr addr);
+    bool inComp(Addr vaddr);
+
+    bool getCMV(Addr paddr);
+
+    void setCMV(Addr paddr, bool vec);
 };
 
 static IsoX isox;
@@ -139,5 +154,5 @@ public:
     int page_perms;
 };
 static IsoxArgus isoxargus;
-#endif /*__BASE_ISOX_HH__*/
+#endif /*__ARCH_ARM_ISOX_HH__*/
 
