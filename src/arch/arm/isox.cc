@@ -46,7 +46,7 @@ CT::CT(void)
     memset(entries, 0, COMPMAX * sizeof(CTEntry));
 }
 
-CTEntry
+CTEntry&
 CT::getEntry(int comp_id)
 {
     return entries[comp_id];
@@ -141,7 +141,7 @@ IsoX::setCMV(Addr paddr, bool vec)
     cmv->setVector(paddr, vec);
 }
 
-CTEntry
+CTEntry&
 IsoX::getEntry(int comp_id)
 {
     return ct->getEntry(comp_id);
