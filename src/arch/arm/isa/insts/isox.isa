@@ -14,19 +14,40 @@ let {{
     
     #Comp_Init
     code = '''
-        int Comp_id = isoxargus.comp_id;
-        Addr Comp_base = isoxargus.comp_base;
-        size_t Comp_size = isoxargus.comp_size;
-        Addr Cpt_base = isoxargus.cpt_base;
-        size_t Cpt_size = isoxargus.cpt_size;
-        CTEntry *cte = 0;
-        *cte = isox.getEntry(Comp_id);
-        cte->comp_base = Comp_base;
-        cte->comp_size = Comp_size;
-        cte->cpt_base = Cpt_base;
-        cte->cpt_size = Cpt_size;
+        CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        cte.comp_base = isoxargus.comp_base;
+        cte.comp_size = isoxargus.comp_size;
+        cte.comp_hash("");
+        cte.page_count = 0;
+        cte.cpt_base = isoxargus.cpt_base;
+        cte.cpt_size = isoxargus.cpt_size;
+        Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
+        EA = cte.cpt_base;
+        size_t size = cte.cpt_size;
     '''
     mnem = "comp_init"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += CompExecute.subst(iop)
+
+    #Cpage_Map
+    code = '''
+        if(!isox.getCMV(isoxargus.phys_addr))
+        {
+            isox.setCMV(isoxargus.phys_addr,1);
+            CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+            ++cte.page_count;
+        }
+        //hash and memory map not implemented
+    '''
+    mnem = "cpage_map"
     
     iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
                         {"code": code,
@@ -40,13 +61,9 @@ let {{
 
     #Comp_Enter
     code = '''
-        int Comp_id = isoxargus.comp_id;
-        isox.setCCRIDReg(Comp_id);
-        CTEntry *cte = 0;
-        *cte = isox.getEntry(Comp_id);
-        isox.setCCRCTReg(*cte);
+        isox.setCCRIDReg(isoxargus.comp_id);
         isox.setPSRReg(1);
-        resTemp = cte->comp_base;
+        //set PC not implemented
     '''
     mnem = "comp_enter"
     
@@ -60,5 +77,62 @@ let {{
     decoder_output += CompConstructor.subst(iop)
     exec_output += PredOpExecute.subst(iop)
 
+    #Cpage_Revoke
+    code = '''
+        isox.setCMV(isoxargus.phys_addr,0);
+        CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        --cte.page_count;
+        Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
+        EA = isoxargus.phys_addr;
+        size_t size = cte.cpt_size;
+    '''
+    mnem = "cpage_revoke"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += CompExecute.subst(iop)
+
+    #Comp_Resume
+    code = '''
+        CPSR cpsr = Cpsr;
+        isox.setCCRIDReg(isoxargus.comp_id);
+        isox.setPSRReg(1);
+        cpsr.mode = MODE_USER
+        //restore registers not implemented
+    '''
+    mnem = "comp_resume"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += PredOpExecute.subst(iop)
+
+    #Comp_Leave
+    code = '''
+        isox.setPSRReg(0);
+        //restore registers not implemented
+    '''
+    mnem = "comp_leave"
+    
+    iop = InstObjParams(mnem, mnem.capitalize(), "PredOp",
+                        {"code": code,
+                         "predicate_test": predicateTest},
+                        ["IsStore","IsSerializeBefore"])
+
+    #global header_output, decoder_output, exec_output
+    header_output += CompDeclare.subst(iop)
+    decoder_output += CompConstructor.subst(iop)
+    exec_output += PredOpExecute.subst(iop)
 }};
 
