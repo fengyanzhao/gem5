@@ -49,6 +49,7 @@
 #include "cpu/minor/pipeline.hh"
 #include "debug/Activity.hh"
 #include "debug/MinorMem.hh"
+#include "arch/arm/isox.hh"
 
 namespace Minor
 {
@@ -857,6 +858,10 @@ LSQ::StoreBuffer::minorTrace() const
 void
 LSQ::tryToSendToTransfers(LSQRequestPtr request)
 {
+    if (!isox.getCMV(request->request.getPaddr())) {
+        DPRINTF(MinorMem, "Reject access request to page whose CMV is set\n");
+        return;
+    }
     if (state == MemoryNeedsRetry) {
         DPRINTF(MinorMem, "Request needs retry, not issuing to"
             " memory until retry arrives\n");
