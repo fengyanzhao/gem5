@@ -46,7 +46,7 @@ CT::CT(void)
     memset(entries, 0, COMPMAX * sizeof(CTEntry));
 }
 
-CTEntry
+CTEntry&
 CT::getEntry(int comp_id)
 {
     return entries[comp_id];
@@ -147,7 +147,7 @@ IsoX::leaveComp()
 
 }
 
-CTEntry
+CTEntry&
 IsoX::getEntry(int comp_id)
 {
     return ct->getEntry(comp_id);

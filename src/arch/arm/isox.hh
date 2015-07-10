@@ -70,7 +70,7 @@ private:
 public:
     CT(void);
 
-    CTEntry getEntry(int comp_id);
+    CTEntry& getEntry(int comp_id);
 };
 
 class IsoX
@@ -107,7 +107,7 @@ public:
      */
     void init(size_t page_cnt, size_t page_bits);
 
-    CTEntry getEntry(int comp_id);
+    CTEntry& getEntry(int comp_id);
 
     Addr readCPTBASEReg();
 
@@ -120,8 +120,6 @@ public:
     void setCPTBASEReg(Addr base);
 
     void setCCRIDReg(int id);
-
-    void setCCRCTReg(CTEntry cte);
 
     void setPSRReg(bool mode);
 
