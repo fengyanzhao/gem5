@@ -50,6 +50,7 @@
 #include "arch/arm/pagetable.hh"
 #include "arch/arm/system.hh"
 #include "arch/arm/table_walker.hh"
+#include "arch/arm/cptable_walker.hh"
 #include "arch/arm/stage2_lookup.hh"
 #include "arch/arm/stage2_mmu.hh"
 #include "arch/arm/tlb.hh"
@@ -62,10 +63,14 @@
 #include "debug/Checkpoint.hh"
 #include "debug/TLB.hh"
 #include "debug/TLBVerbose.hh"
+#include "debug/IsoX.hh"
 #include "mem/page_table.hh"
 #include "params/ArmTLB.hh"
 #include "sim/full_system.hh"
 #include "sim/process.hh"
+
+/* Iso-X component */
+#include "arch/arm/isox.hh"
 
 using namespace std;
 using namespace ArmISA;
@@ -73,13 +78,16 @@ using namespace ArmISA;
 TLB::TLB(const ArmTLBParams *p)
     : BaseTLB(p), table(new TlbEntry[p->size]), size(p->size),
       isStage2(p->is_stage2), stage2Req(false), _attr(0),
-      directToStage2(false), tableWalker(p->walker), stage2Tlb(NULL),
+      directToStage2(false), tableWalker(p->walker), cptableWalker(p->cptwalker), stage2Tlb(NULL),
       stage2Mmu(NULL), rangeMRU(1),
       aarch64(false), aarch64EL(EL0), isPriv(false), isSecure(false),
       isHyp(false), asid(0), vmid(0), dacr(0),
       miscRegValid(false), curTranType(NormalTran)
 {
     tableWalker->setTlb(this);
+
+    DPRINTF(IsoX, "Initialize CPT walker\n");
+    cptableWalker->setTlb(this);
 
     // Cache system-level properties
     haveLPAE = tableWalker->haveLPAE();
@@ -1323,6 +1331,8 @@ TLB::getTE(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
     bool is_fetch = (mode == Execute);
     bool is_write = (mode == Write);
 
+    bool is_comp = isox.isCompMode();
+
     Addr vaddr_tainted = req->getVaddr();
     Addr vaddr = 0;
     ExceptionLevel target_el = aarch64 ? aarch64EL : EL1;
@@ -1331,6 +1341,9 @@ TLB::getTE(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
     } else {
         vaddr = vaddr_tainted;
     }
+
+    bool in_comp = isox.inComp(vaddr);
+
     *te = lookup(vaddr, asid, vmid, isHyp, is_secure, false, false, target_el);
     if (*te == NULL) {
         if (req->isPrefetch()) {
@@ -1349,14 +1362,26 @@ TLB::getTE(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
         else
             readMisses++;
 
-        // start translation table walk, pass variables rather than
-        // re-retreaving in table walker for speed
-        DPRINTF(TLB, "TLB Miss: Starting hardware table walker for %#x(%d:%d)\n",
-                vaddr_tainted, asid, vmid);
         Fault fault;
-        fault = tableWalker->walk(req, tc, asid, vmid, isHyp, mode,
-                                  translation, timing, functional, is_secure,
-                                  tranType);
+        if (is_comp && in_comp) {
+            // start translation table walk, pass variables rather than
+            // re-retreaving in table walker for speed
+            DPRINTF(IsoX, "IsoX: TLB Miss: Starting hardware table walker for %#x(%d:%d)\n",
+                    vaddr_tainted, asid, vmid);
+            fault = cptableWalker->walk(req, tc, asid, vmid, isHyp, mode,
+                                      translation, timing, functional, is_secure,
+                                      tranType);
+        } else {
+            DPRINTF(TLB, "TLB Miss: Starting hardware table walker for %#x(%d:%d)\n",
+                    vaddr_tainted, asid, vmid);
+            fault = tableWalker->walk(req, tc, asid, vmid, isHyp, mode,
+                                      translation, timing, functional, is_secure,
+                                      tranType);
+            if (is_comp && !in_comp) {
+                isox.leaveComp();
+            }
+        }
+
         // for timing mode, return and wait for table walk,
         if (timing || fault != NoFault) {
             return fault;

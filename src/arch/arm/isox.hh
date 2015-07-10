@@ -132,6 +132,8 @@ public:
     bool getCMV(Addr paddr);
 
     void setCMV(Addr paddr, bool vec);
+
+    void leaveComp();
 };
 
 static IsoX isox;

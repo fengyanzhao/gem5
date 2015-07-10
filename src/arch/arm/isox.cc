@@ -141,6 +141,12 @@ IsoX::setCMV(Addr paddr, bool vec)
     cmv->setVector(paddr, vec);
 }
 
+void
+IsoX::leaveComp()
+{
+
+}
+
 CTEntry
 IsoX::getEntry(int comp_id)
 {

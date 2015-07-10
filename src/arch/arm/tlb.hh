@@ -60,6 +60,7 @@ class ThreadContext;
 namespace ArmISA {
 
 class TableWalker;
+class CPTableWalker;
 class Stage2LookUp;
 class Stage2MMU;
 
@@ -103,6 +104,10 @@ class TLB : public BaseTLB
                          // be routed directly to the stage 2 TLB
 
     TableWalker *tableWalker;
+
+    //Compartment page table walker
+    CPTableWalker *cptableWalker;
+
     TLB *stage2Tlb;
     Stage2MMU *stage2Mmu;
 

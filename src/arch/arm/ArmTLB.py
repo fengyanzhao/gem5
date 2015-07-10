@@ -59,12 +59,27 @@ class ArmTableWalker(MemObject):
 
     sys = Param.System(Parent.any, "system object parameter")
 
+# Translation object for compartment page table
+class ArmCPTableWalker(MemObject):
+    type = 'ArmCPTableWalker'
+    cxx_class = 'ArmISA::CPTableWalker'
+    cxx_header = "arch/arm/cptable_walker.hh"
+    is_stage2 = Param.Bool(False, "Is this object for stage 2 translation?")
+    num_squash_per_cycle = Param.Unsigned(2,
+            "Number of outstanding walks that can be squashed per cycle")
+
+    port = MasterPort("Port used by the two table walkers")
+
+    sys = Param.System(Parent.any, "system object parameter")
+
+
 class ArmTLB(SimObject):
     type = 'ArmTLB'
     cxx_class = 'ArmISA::TLB'
     cxx_header = "arch/arm/tlb.hh"
     size = Param.Int(64, "TLB size")
     walker = Param.ArmTableWalker(ArmTableWalker(), "HW Table walker")
+    cptwalker = Param.ArmCPTableWalker(ArmCPTableWalker(), "HW CPT walker")
     is_stage2 = Param.Bool(False, "Is this a stage 2 TLB?")
 
 # Stage 2 translation objects, only used when virtualisation is being used
