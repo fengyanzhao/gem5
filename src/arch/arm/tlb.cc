@@ -1386,7 +1386,7 @@ TLB::getTE(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
             fault = tableWalker->walk(req, tc, asid, vmid, isHyp, mode,
                                       translation, timing, functional, is_secure,
                                       tranType);
-            if (is_comp && !in_comp) {
+            if (is_comp && !in_comp && is_fetch) {
                 isox.leaveComp();
             }
         }
