@@ -65,6 +65,9 @@ IsoX::init(size_t page_cnt, size_t page_bits)
 {
     cmv = new CMV(page_cnt, page_bits);
     ct = new CT();
+    psr = false;
+    cpt_base = 0x0;
+    ccr_id = -1;
 }
 
 Addr
@@ -144,7 +147,7 @@ IsoX::setCMV(Addr paddr, bool vec)
 void
 IsoX::leaveComp()
 {
-
+    psr = false;
 }
 
 CTEntry&

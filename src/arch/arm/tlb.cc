@@ -1371,6 +1371,15 @@ TLB::getTE(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
             fault = cptableWalker->walk(req, tc, asid, vmid, isHyp, mode,
                                       translation, timing, functional, is_secure,
                                       tranType);
+        } else if (!is_comp && in_comp) {
+            ArmFault::TranMethod tranMethod = (*te)->longDescFormat ? ArmFault::LpaeTran
+                                                         : ArmFault::VmsaTran;
+            return std::make_shared<DataAbort>(
+                    vaddr_tainted,
+                    TlbEntry::DomainType::NoAccess, is_write,
+                    ArmFault::PermissionLL + (*te)->lookupLevel,
+                    isStage2,
+                    tranMethod);
         } else {
             DPRINTF(TLB, "TLB Miss: Starting hardware table walker for %#x(%d:%d)\n",
                     vaddr_tainted, asid, vmid);
@@ -1415,6 +1424,14 @@ TLB::getResultTe(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
     // Get the stage 1 table entry
     fault = getTE(&s1Te, req, tc, mode, translation, timing, functional,
                   isSecure, curTranType);
+    if (!isox.getCMV(req->getPaddr())) {
+        ArmFault::TranMethod tranMethod = (*te)->longDescFormat ? ArmFault::LpaeTran
+                                                         : ArmFault::VmsaTran;
+        return std::make_shared<DataAbort>(
+                    vaddr_tainted, (*te)->domain, (mode == Write),
+                    ArmFault::PermissionLL + (*te)->lookupLevel,
+                    isStage2, tranMethod);
+    }
     // only proceed if we have a valid table entry
     if ((s1Te != NULL) && (fault == NoFault)) {
         // Check stage 1 permissions before checking stage 2
