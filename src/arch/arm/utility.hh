@@ -102,6 +102,8 @@ testPredicate(uint32_t nz, uint32_t c, uint32_t v, ConditionCode code)
 template <class TC>
 void zeroRegisters(TC *tc);
 
+void zeroRegisters(ThreadContext *tc);
+
 inline void startupCPU(ThreadContext *tc, int cpuId)
 {
     tc->activate();

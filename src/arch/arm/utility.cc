@@ -144,6 +144,32 @@ skipFunction(ThreadContext *tc)
     }
 }
 
+void zeroRegisters(ThreadContext *tc)
+{
+    for (int i = 0; i < NumIntRegs; i++)
+        tc->setIntRegFlat(i, 0);
+
+    for (int i = 0; i < NumFloatRegs; i++)
+        tc->setFloatRegFlat(i, 0.0);
+
+    for (int i = 0; i < NumCCRegs; i++)
+        tc->setCCReg(i, 0);
+
+    for (int i = 0; i < NumMiscRegs; i++)
+        tc->setMiscRegNoEffect(i, 0);
+
+    // setMiscReg "with effect" will set the misc register mapping correctly.
+    // e.g. updateRegMap(val)
+    tc->setMiscReg(MISCREG_CPSR, 0);
+
+    // Copy over the PC State
+    //tc->pcState(src->pcState());
+
+    // Invalidate the tlb misc register cache
+    tc->getITBPtr()->invalidateMiscReg();
+    tc->getDTBPtr()->invalidateMiscReg();
+}
+
 void
 copyRegs(ThreadContext *src, ThreadContext *dest)
 {

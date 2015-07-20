@@ -9,21 +9,21 @@
 def format IsoxInst() {{
     decode_block = '''
     {
-        const uint32_t op1 = bits(machInst, 24, 22);
+        const uint32_t op1 = bits(machInst, 24, 20);
 	switch (op1) { 
-          case 0x0:
+          case 0x18:
             return new Comp_init(machInst);
-          case 0x1:
+          case 0x19:
             return new Cpage_map(machInst);
-          case 0x2:
+          case 0x1a:
             return new Comp_enter(machInst);
-          case 0x4:
+          case 0x1c:
             return new Cpage_revoke(machInst);
-          case 0x5:
+          case 0x1d:
             return new Comp_resume(machInst);
-          case 0x6:
+          case 0x1e:
             return new Comp_leave(machInst);
-          /*case 0x3:
+          /*case 0x1b:
             return new Comp_attest(machInst);
           */
           default:

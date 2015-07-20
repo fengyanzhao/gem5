@@ -72,13 +72,13 @@ format DataOp {
                     0x3: decode OPCODE {
                         0x9: ArmBlxReg::armBlxReg();
                     }
+                    0x4: IsoxInst::isoxinst();
                     0x5: ArmSatAddSub::armSatAddSub();
                     0x6: ArmERet::armERet();
                     0x7: decode OPCODE_22 {
                         0: Breakpoint::bkpt();
                         1: ArmSmcHyp::armSmcHyp();
                     }
-		    0x8: IsoxInst::isoxinst();
                 }
                 0x1: ArmHalfWordMultAndMultAcc::armHalfWordMultAndMultAcc();
             }
