@@ -149,10 +149,23 @@ public:
     size_t comp_size;
     Addr cpt_base;
     size_t cpt_size;
-    Addr virt_addr;
     Addr phys_addr;
-    int page_perms;
+    size_t page_bits;
 };
 static IsoxArgus isoxargus;
+
+/* Meta-page, currently just for testing
+ * will be removed later
+ */
+class MetaPage
+{
+private:
+public:
+    MetaPage(){};
+    ThreadContext *tc;
+    string comp_pubkey;
+    string certify;
+};
+static MetaPage metapage;
 #endif /*__ARCH_ARM_ISOX_HH__*/
 
