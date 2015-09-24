@@ -112,6 +112,7 @@ TLB::setMMU(Stage2MMU *m, MasterID master_id)
 {
     stage2Mmu = m;
     tableWalker->setMMU(m, master_id);
+    cptableWalker->setMMU(m, master_id);
 }
 
 bool
