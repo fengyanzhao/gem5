@@ -23,7 +23,8 @@ let {{
         cte.cpt_base = isoxargus.cpt_base;
         cte.cpt_size = isoxargus.cpt_size;
 
-        Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
+        Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
+        //Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
         EA = cte.cpt_base;
         size_t size = cte.cpt_size;
     '''
@@ -82,6 +83,8 @@ let {{
         isox.setCCRIDReg(isoxargus.comp_id);
 
         isox.setPSRReg(1);
+        
+        LR = PC - 4;
 
         setNextPC(xc, isox.readCCRCTReg().comp_base);
     '''
@@ -128,9 +131,13 @@ let {{
         isox.setCCRIDReg(isoxargus.comp_id);
 
         cpsr.mode = MODE_USER;
-
-        ThreadContext *tc = xc->tcBase();
-        copyRegs(metapage.tc, tc);
+       /*  for (int i = 0; i < 16; i++)
+         {
+          tc->setIntReg(i,metapage.isoxregs[i]);
+         }
+       */
+       // ThreadContext *tc = xc->tcBase();
+        //copyRegs(metapage.tc, tc);
 
         isox.setPSRReg(1);
     '''
@@ -148,9 +155,20 @@ let {{
 
     #Comp_Leave
     code = '''
-        ThreadContext *tc = xc->tcBase();
-        copyRegs(tc, metapage.tc);
-        zeroRegisters(tc);
+         ThreadContext *tc = xc->tcBase();
+    for (int i = 0; i < 16; i++)
+    {
+       metapage.isoxregs[i] =tc->readIntReg(i);
+    }
+     for (int i = 1; i < 8; i++)
+    {
+       tc->setIntReg(i,0);
+    }
+
+       // copyRegs(tc, metapage.tc);
+       // zeroRegisters(tc);
+         // tc->clearArchRegs();
+          //tc->copyArchRegs(tc);
 
         CTEntry &cte = isox.getEntry(isox.readCCRIDReg());
         cte.comp_base = isox.readCCRCTReg().comp_base;
@@ -172,6 +190,19 @@ let {{
     #global header_output, decoder_output, exec_output
     header_output += CompDeclare.subst(iop)
     decoder_output += CompConstructor.subst(iop)
+    exec_output += PredOpExecute.subst(iop)
+   
+    #rct
+    code = "Dest = resTemp = secondOp;"
+    mnem = "rct"
+    regRegCode = secondOpRe.sub(regRegOp2, code)
+    iop = InstObjParams(mnem, mnem.capitalize(),
+                          "DataRegRegOp",
+                          {"code" : regRegCode,
+                           "predicate_test": pickPredicate(regRegCode)})
+    #global header_output, decoder_output, exec_output
+    header_output += DataRegRegDeclare.subst(iop)
+    decoder_output += DataRegRegConstructor.subst(iop)
     exec_output += PredOpExecute.subst(iop)
 }};
 

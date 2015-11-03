@@ -162,7 +162,7 @@ class MetaPage
 private:
 public:
     MetaPage(){};
-    ThreadContext *tc;
+    int isoxregs[16];
     string comp_pubkey;
     string certify;
 };

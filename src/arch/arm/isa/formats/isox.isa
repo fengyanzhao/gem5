@@ -9,26 +9,37 @@
 def format IsoxInst() {{
     decode_block = '''
     {
-        const uint32_t op1 = bits(machInst, 24, 20);
+        const IntRegIndex rd = (IntRegIndex)(uint32_t)bits(machInst, 18, 14);
+        const IntRegIndex rm = (IntRegIndex)(uint32_t)bits(machInst, 13, 9);
+        const IntRegIndex rs = (IntRegIndex)(uint32_t)0;
+        const ArmShiftType type = (ArmShiftType)(uint32_t)3;
+        const uint32_t op1 = bits(machInst, 22, 19);
+        const uint32_t op2 = bits(machInst, 8);
+        if(op2==1) {
 	switch (op1) { 
-          case 0x18:
+          case 0x0:
             return new Comp_init(machInst);
-          case 0x19:
+          case 0x1:
             return new Cpage_map(machInst);
-          case 0x1a:
+          case 0x4:
             return new Comp_enter(machInst);
-          case 0x1c:
+          case 0x8:
             return new Cpage_revoke(machInst);
-          case 0x1d:
+          case 0x9:
             return new Comp_resume(machInst);
-          case 0x1e:
+          case 0xc:
             return new Comp_leave(machInst);
-          /*case 0x1b:
+          case 0xd:
+            return new Rct(machInst, rd, INTREG_ZERO, rm, rs, type);
+          /*case 0x5:
             return new Comp_attest(machInst);
           */
           default:
             return new Unknown(machInst);
 	 }
+       }
+       else
+            return new Unknown(machInst);
     }
     '''
 }};

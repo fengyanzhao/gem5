@@ -52,6 +52,8 @@
 
 using std::vector;
 
+const size_t HDLcd::VERSION_RESETV;
+const size_t HDLcd::BUS_OPTIONS_RESETV;
 
 // initialize hdlcd registers
 HDLcd::HDLcd(const Params *p)

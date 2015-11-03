@@ -45,9 +45,8 @@ def template CompExecute {{
             %(code)s;
             if (fault == NoFault)
             {
-                fault = xc->writeMem(NULL, size, EA, memAccessFlags,
-                        NULL);
-            }
+                fault = xc->writeMem(NULL, size, EA, memAccessFlags, NULL);
+           }
         } else {
             xc->setPredicate(false);
         }
