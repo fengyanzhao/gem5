@@ -858,7 +858,7 @@ LSQ::StoreBuffer::minorTrace() const
 void
 LSQ::tryToSendToTransfers(LSQRequestPtr request)
 {
-    if (!isox.getCMV(request->request.getPaddr())) {
+    if (request->request.hasPaddr() && !isox.isCompMode() && isox.getCMV(request->request.getPaddr())) {
         DPRINTF(MinorMem, "Reject access request to page whose CMV is set\n");
         return;
     }

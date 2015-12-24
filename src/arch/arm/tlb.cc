@@ -1425,7 +1425,7 @@ TLB::getResultTe(TlbEntry **te, RequestPtr req, ThreadContext *tc, Mode mode,
     // Get the stage 1 table entry
     fault = getTE(&s1Te, req, tc, mode, translation, timing, functional,
                   isSecure, curTranType);
-    if (!isox.getCMV(req->getPaddr())) {
+    if (req->hasPaddr() && !isox.isCompMode() && isox.getCMV(req->getPaddr())) {
         ArmFault::TranMethod tranMethod = (*te)->longDescFormat ? ArmFault::LpaeTran
                                                          : ArmFault::VmsaTran;
         return std::make_shared<DataAbort>(

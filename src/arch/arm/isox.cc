@@ -7,11 +7,12 @@
 
 #include "isox.hh"
 
-CMV::CMV(size_t page_cnt, size_t page_bits)
+CMV::CMV(size_t page_cnt, size_t _page_bits)
 {
     page_count = page_cnt;
-    page_bits = page_bits;
+    page_bits = _page_bits;
     vectors = (bool *)calloc(page_cnt, sizeof(bool));
+    memset(vectors, 0, page_cnt * sizeof(bool));
 }
 
 CMV::~CMV(void)
