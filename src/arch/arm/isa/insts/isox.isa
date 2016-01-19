@@ -14,14 +14,28 @@ let {{
     
     #Comp_Init
     code = '''
-        CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        
+        ThreadContext *tc = xc->tcBase();
+        /*tc->setIntReg() just use initialize isox registers,we will move it after modification of linux*/
+       /* tc->setIntReg(INTREG_COMP_BASE,0x000100f4);
+        tc->setIntReg(INTREG_COMP_SIZE,0x1000);
+        tc->setIntReg(INTREG_CPT_BASE,0x00011000);
+        tc->setIntReg(INTREG_CPT_SIZE,0x30);
+        tc->setIntReg(INTREG_COMP_ID,5);
+        tc->setIntReg(INTREG_PHYS_ADDR,0x000100f4); */
+        //CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        CTEntry &cte = isox.getEntry(tc->readIntReg(INTREG_COMP_ID));
 
-        cte.comp_base = isoxargus.comp_base;
-        cte.comp_size = isoxargus.comp_size;
+        cte.comp_base = tc->readIntReg(INTREG_COMP_BASE);
+        // cte.comp_base = isoxargus.comp_base;
+        cte.comp_size = tc->readIntReg(INTREG_COMP_SIZE);
+        // cte.comp_size = isoxargus.comp_size;
         cte.comp_hash("");
         cte.page_count = 0;
-        cte.cpt_base = isoxargus.cpt_base;
-        cte.cpt_size = isoxargus.cpt_size;
+        //cte.cpt_base = isoxargus.cpt_base;
+        //cte.cpt_size = isoxargus.cpt_size;
+        cte.cpt_base = tc->readIntReg(INTREG_CPT_BASE);
+        cte.cpt_size = tc->readIntReg(INTREG_CPT_SIZE);
 
         Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
         //Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
@@ -42,7 +56,7 @@ let {{
 
     #Cpage_Map
     code = '''
-        CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        CTEntry &cte = isox.getEntry(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
         for(Addr Vaddr = cte.comp_base; Vaddr <= cte.comp_base + cte.comp_size; Vaddr++)
         {
@@ -80,7 +94,7 @@ let {{
 
     #Comp_Enter
     code = '''
-        isox.setCCRIDReg(isoxargus.comp_id);
+        isox.setCCRIDReg(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
         isox.setPSRReg(1);
         
@@ -102,10 +116,10 @@ let {{
 
     #Cpage_Revoke
     code = '''
-        CTEntry &cte = isox.getEntry(isoxargus.comp_id);
+        CTEntry &cte = isox.getEntry(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
         Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
-        EA = isoxargus.phys_addr;
+        EA = isoxargus.phys_addr;/*isoxargus need replace by tc->readIntReg()*/
         size_t size = isoxargus.page_bits;
 
         isox.setCMV(isoxargus.phys_addr, 0);
@@ -128,7 +142,7 @@ let {{
     code = '''
         CPSR cpsr = Cpsr;
 
-        isox.setCCRIDReg(isoxargus.comp_id);
+        isox.setCCRIDReg(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
         cpsr.mode = MODE_USER;
        /*  for (int i = 0; i < 16; i++)

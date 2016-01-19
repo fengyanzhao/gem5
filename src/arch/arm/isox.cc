@@ -159,12 +159,12 @@ IsoX::getEntry(int comp_id)
 
 IsoxArgus::IsoxArgus(void)
 {
-     comp_id=5;
-     comp_base=0x000100f4;
-     comp_size=0x1000;
-     cpt_base=0x00011000;
-     cpt_size=0x30;
-     phys_addr=0x000100f4;
+     //comp_id=5;
+    // comp_base=0x000100f4;
+    // comp_size=0x1000;
+     //cpt_base=0x00011000;
+     //cpt_size=0x30;
+    // phys_addr=0x000100f4;
      page_bits=1;
  //No implementation.
 }
