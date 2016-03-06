@@ -25,7 +25,7 @@ let {{
         tc->setIntReg(INTREG_PHYS_ADDR,0x000100f4); */
         //CTEntry &cte = isox.getEntry(isoxargus.comp_id);
         CTEntry &cte = isox.getEntry(tc->readIntReg(INTREG_COMP_ID));
-        DPRINTF(Myflag,"hello,i am comp_init instruction\\n");
+        DPRINTF(Myflag,"comp_init \\n\\n");
         cte.comp_base = tc->readIntReg(INTREG_COMP_BASE);
         // cte.comp_base = isoxargus.comp_base;
         cte.comp_size = tc->readIntReg(INTREG_COMP_SIZE);
@@ -62,7 +62,7 @@ let {{
            if(!isox.getCMV(Paddr)){
            isox.setCMV(Paddr, 1);
            }
-           DPRINTF(Myflag,"hello,i am Cpage_Map instruction\\n");
+           DPRINTF(Myflag," Cpage_Map \\n\\n");
         /*
         for(Addr Vaddr = cte.comp_base; Vaddr <= cte.comp_base + cte.comp_size; Vaddr++)
         {
@@ -102,7 +102,7 @@ let {{
     code = '''
         isox.setCCRIDReg(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
-        DPRINTF(Myflag,"hello,i am Cpage_Map instruction\\n");
+        DPRINTF(Myflag,"comp_enter\\n\\n");
 
         isox.setPSRReg(1);
         
@@ -129,7 +129,7 @@ let {{
         Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
         EA = isoxargus.phys_addr;/*isoxargus need replace by tc->readIntReg()*/
 
-        DPRINTF(Myflag,"hello,i am cpage_revoke instruction\\n");
+        DPRINTF(Myflag,"cpage_revoke \\n\\n");
 
         size_t size = isoxargus.page_bits;
 
@@ -157,7 +157,7 @@ let {{
 
         cpsr.mode = MODE_USER;
 
-        DPRINTF(Myflag,"hello,i am Comp_Resume instruction\\n");
+        DPRINTF(Myflag,"Comp_Resume \\n\\n");
        /*  for (int i = 0; i < 16; i++)
          {
           tc->setIntReg(i,metapage.isoxregs[i]);
@@ -187,7 +187,7 @@ let {{
     {
        metapage.isoxregs[i] =tc->readIntReg(i);
     }
-    DPRINTF(Myflag,"hello,i am Comp_Leave instruction\\n");
+    DPRINTF(Myflag," Comp_Leave \\n\\n");
      for (int i = 1; i < 8; i++)
     {
        tc->setIntReg(i,0);
