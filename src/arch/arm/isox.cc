@@ -23,7 +23,8 @@ CMV::~CMV(void)
 void
 CMV::setVector(Addr paddr, bool vec)
 {
-    int index = (int)(paddr >> page_bits);
+    //int index = (int)(paddr >> page_bits);   //paddr is 12 bits
+    int index = (int)(paddr);
     if (index > page_count)
     {
         //Should never happen.

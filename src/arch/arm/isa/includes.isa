@@ -100,6 +100,8 @@ output exec {{
 
 #include "base/cp_annotate.hh"
 #include "debug/Arm.hh"
+#include "debug/Myflag.hh"
+#include "base/cprintf.hh"
 #include "mem/packet.hh"
 #include "mem/packet_access.hh"
 #include "sim/sim_exit.hh"
