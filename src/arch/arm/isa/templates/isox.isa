@@ -33,7 +33,7 @@ def template CompConstructor {{
 def template CompExecute {{
     Fault %(class_name)s::execute(CPU_EXEC_CONTEXT *xc, Trace::InstRecord *traceData) const
     {
-        Addr EA;
+        //Addr EA;
         Fault fault = NoFault;
         uint64_t resTemp = 0;
         resTemp = resTemp;
@@ -45,7 +45,7 @@ def template CompExecute {{
             %(code)s;
             if (fault == NoFault)
             {
-                fault = xc->writeMem(NULL, size, EA, memAccessFlags, NULL);
+               // fault = xc->writeMem(NULL, size, EA, memAccessFlags, NULL);
            }
         } else {
             xc->setPredicate(false);

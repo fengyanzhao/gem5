@@ -31,15 +31,18 @@ let {{
         cte.comp_size = tc->readIntReg(INTREG_COMP_SIZE);
         // cte.comp_size = isoxargus.comp_size;
         cte.comp_hash("");
+        DPRINTF(Myflag,"comp_init  cte.comp_hash\\n\\n");
         cte.page_count = 0;
         //cte.cpt_base = isoxargus.cpt_base;
         //cte.cpt_size = isoxargus.cpt_size;
-        cte.cpt_base = tc->readIntReg(INTREG_CPT_BASE);
-        cte.cpt_size = tc->readIntReg(INTREG_CPT_SIZE);
+        //cte.cpt_base = tc->readIntReg(INTREG_CPT_BASE);
+        //cte.cpt_size = tc->readIntReg(INTREG_CPT_SIZE);
 
-        Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
-        EA = cte.cpt_base;
-        size_t size = cte.cpt_size;
+        //Request::Flags memAccessFlags = Request::CACHE_BLOCK_ZERO|ArmISA::TLB::MustBeOne;
+        DPRINTF(Myflag,"comp_init  memAccessFlags\\n\\n");
+        //EA = cte.cpt_base;
+        //size_t size = cte.cpt_size;
+        DPRINTF(Myflag,"comp_init  size = cte.cpt_size\\n\\n");
     '''
     mnem = "comp_init"
     
@@ -126,12 +129,12 @@ let {{
     code = '''
         CTEntry &cte = isox.getEntry(xc->tcBase()->readIntReg(INTREG_COMP_ID));
 
-        Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
-        EA = isoxargus.phys_addr;/*isoxargus need replace by tc->readIntReg()*/
+        //Request::Flags memAccessFlags = Request::PRIVILEGED|ArmISA::TLB::MustBeOne;
+      //  EA = isoxargus.phys_addr;/*isoxargus need replace by tc->readIntReg()*/
 
         DPRINTF(Myflag,"cpage_revoke \\n\\n");
 
-        size_t size = isoxargus.page_bits;
+        //size_t size = isoxargus.page_bits;
 
         isox.setCMV(isoxargus.phys_addr, 0);
 
