@@ -7,8 +7,10 @@ SECTIONS
 {
   /* Read-only sections, merged into text segment: */
   PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x00010000)); . = SEGMENT_START("text-segment", 0x00010000) + SIZEOF_HEADERS;
-  .comp_text           :
+
+  .comp_text ALIGN(0x1000)          :
   {
+    __COMP__ = .;
     comp.o(.text.unlikely .text.*_unlikely .text.unlikely.*)
     comp.o(.text.exit .text.exit.*)
     comp.o(.text.startup .text.startup.*)
@@ -17,6 +19,7 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     comp.o(.gnu.warning)
     comp.o(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)
+    . = __COMP__ + 0x1000;
   }
    .comp_data           :
   {
@@ -24,12 +27,6 @@ SECTIONS
     comp.o(.data .data.* .gnu.linkonce.d.*)
     SORT(CONSTRUCTORS)
   }
-  . = 0x00011000;
-  .metapage           :
-   {
-    
-   }
-  . = 0x00011500; 
   .interp         : { *(.interp) }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
   .hash           : { *(.hash) }
