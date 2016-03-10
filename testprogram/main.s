@@ -23,17 +23,6 @@ main:
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {fp, lr}
 	add	fp, sp, #4
-        mov     r0 ,#5
-        rct     r0, r43
-        ldr     r0, =#0x000100f4
-        rct     r0, r44
-        ldr     r0, =#0x1000
-        rct     r0, r45  
-        ldr     r0, =#0x00011000
-        rct     r0, r46
-        ldr     r0, =#0x30
-        rct     r0, r47
-        comp_init
 	mov	r3, #7
 	str	r3, [fp, #-8]
 	mov	r3, #8
@@ -41,8 +30,8 @@ main:
 	ldr	r0, [fp, #-12]
 	ldr	r1, [fp, #-8]
 	comp_enter
-        comp_leave
-        rct r3,r3
+	comp_leave
+	rct r3,r3
 	str	r0, [fp, #-16]
 	ldr	r0, .L2
 	ldr	r1, [fp, #-16]
